@@ -4,10 +4,10 @@ package linq2go
 func (s *Slice[T]) Except(slice []T, fn func(T, T) bool) *Slice[T] {
 	result := []T{}
 
-	for _, v1 := range slice {
+	for _, elem := range s.s {
 		// All the slices must satisfy the fn condition: this means that elem isn't contained in any of the other slices
-		if !s.Contains(v1, fn) {
-			result = append(result, v1)
+		if !FromSlice(slice).Contains(elem, fn) {
+			result = append(result, elem)
 		}
 	}
 
