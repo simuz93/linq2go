@@ -1,13 +1,13 @@
 package linq2go
 
-type Slice[T any] struct {
+type slice[T any] struct {
 	s []T
 }
 
-type Map[K comparable, V any] struct {
+type dictionary[K comparable, V any] struct {
 	m map[K]V
 }
 
-type Group[K comparable, V any] struct {
+type group[K comparable, V any] struct {
 	m map[K][]V
 }

@@ -1,7 +1,7 @@
 package linq2go
 
 // ExceptBy returns a new slice with the elements included in the first slice given but not included in the others
-func (s *Slice[T]) Except(slice []T, fn func(T, T) bool) *Slice[T] {
+func (s *slice[T]) Except(slice []T, fn func(T, T) bool) *slice[T] {
 	result := []T{}
 
 	values := FromSlice(slice)

@@ -1,7 +1,7 @@
 package linq2go
 
 // Intersect returns a new slice with the intersection of the given ones
-func (s *Slice[T]) Intersect(slice []T, fn func(T, T) bool) *Slice[T] {
+func (s *slice[T]) Intersect(slice []T, fn func(T, T) bool) *slice[T] {
 	result := []T{}
 
 	values := FromSlice(slice)
