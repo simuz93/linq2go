@@ -2,9 +2,9 @@ package linq2go
 
 // FirstOrNil returns the first occurrence of an element that matches the given function or nil if no element matches it
 func (s *slice[T]) FirstOrNil(fn func(T) bool) *T {
-	for i := range s.s {
-		if fn(s.s[i]) {
-			return &s.s[i]
+	for _, v := range s.s {
+		if fn(v) {
+			return &v
 		}
 	}
 
