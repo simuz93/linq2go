@@ -4,8 +4,10 @@ package linq2go
 func (s *Slice[T]) Intersect(slice []T, fn func(T, T) bool) *Slice[T] {
 	result := []T{}
 
+	values := FromSlice(slice)
+
 	for _, elem := range s.s {
-		if FromSlice(slice).Contains(elem, fn) {
+		if values.Contains(elem, fn) {
 			result = append(result, elem)
 		}
 	}
