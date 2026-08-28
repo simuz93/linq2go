@@ -1,9 +1,9 @@
 package linq2go
 
 /*
-GroupBy groups the given slice using the key selected by the groupBy function. Then it applies the fn function to each group.
+Group groups the given slice using the key selected by the groupBy function. Then it applies the fn function to each group.
 */
-func (s *Slice[T]) GroupBy[K comparable](fn func(T) K) *Group[K, T] {
+func (s *Slice[T]) Group[K comparable](fn func(T) K) *Group[K, T] {
 	groups := make(map[K][]T)
 
 	for _, v := range s.s {
