@@ -6,12 +6,7 @@ func (s *slice[T]) Group[K comparable](fn func(T) K) *group[K, T] {
 
 	for _, v := range s.s {
 		key := fn(v)
-
-		if _, ok := groups[key]; !ok {
-			groups[key] = []T{v}
-		} else {
-			groups[key] = append(groups[key], v)
-		}
+		groups[key] = append(groups[key], v)
 	}
 
 	return newGroup(groups)
