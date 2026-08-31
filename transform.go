@@ -1,6 +1,6 @@
 package linq2go
 
-// TransformMap creates a new map from the given one by selecting a new key-value pair for each existing one
+// Transform returns a new map with the key-value pair fn returns for each entry. On a key collision which entry survives is not predictable
 func (m *dictionary[K, V]) Transform[NewK comparable, NewV any](fn func(key K, value V) (NewK, NewV)) *dictionary[NewK, NewV] {
 	result := map[NewK]NewV{}
 	for k, v := range m.m {
@@ -11,7 +11,7 @@ func (m *dictionary[K, V]) Transform[NewK comparable, NewV any](fn func(key K, v
 	return newDictionary(result)
 }
 
-// ChangeMapKey creates a new map from the given one assigning each element to the new key created by the given function
+// ChangeKey returns a new map with the same values re-keyed by fn. On a key collision which entry survives is not predictable
 func (m *dictionary[K, V]) ChangeKey[NewK comparable](fn func(key K, value V) NewK) *dictionary[NewK, V] {
 	return m.Transform(func(k K, v V) (NewK, V) { return fn(k, v), v })
 }

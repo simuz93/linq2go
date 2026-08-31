@@ -1,6 +1,6 @@
 package linq2go
 
-// ExceptBy returns a new slice with the elements included in the first slice given but not included in the others
+// Except returns a new slice with the elements that match no value in slice according to fn. Duplicates are kept
 func (s *slice[T]) Except(slice []T, fn func(T, T) bool) *slice[T] {
 	result := []T{}
 

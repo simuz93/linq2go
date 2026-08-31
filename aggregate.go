@@ -5,9 +5,7 @@ import (
 	"slices"
 )
 
-/*
-Sum returns the sum of the values selected by the function
-*/
+// Sum returns the sum of the values selected by fn
 func (s *slice[T]) Sum[K Number](fn func(T) K) K {
 	var sum K = 0
 
@@ -18,9 +16,7 @@ func (s *slice[T]) Sum[K Number](fn func(T) K) K {
 	return sum
 }
 
-/*
-Min returns the minimum value selected by the function, or 0 if the slice is empty
-*/
+// Min returns the smallest value selected by fn, or 0 if the slice is empty
 func (s *slice[T]) Min[K Number](fn func(T) K) K {
 	if len(s.s) == 0 {
 		return 0
@@ -38,10 +34,7 @@ func (s *slice[T]) Min[K Number](fn func(T) K) K {
 	return min
 }
 
-/*
-WhereMin use the given function to select a field of each element and returns the element with the minimum value in that field, or default if the slice is empty.
-Uses slices.MinFunc
-*/
+// WhereMin returns the element whose value selected by fn is the smallest, or the zero value if the slice is empty
 func (s *slice[T]) WhereMin[K Number](fn func(T) K) T {
 	if len(s.s) == 0 {
 		return *new(T)
@@ -54,9 +47,7 @@ func (s *slice[T]) WhereMin[K Number](fn func(T) K) T {
 	return slices.MinFunc(s.s, cmp)
 }
 
-/*
-Max returns the maximum value selected by the function, or 0 if the slice is empty
-*/
+// Max returns the largest value selected by fn, or 0 if the slice is empty
 func (s *slice[T]) Max[K Number](fn func(T) K) K {
 	if len(s.s) == 0 {
 		return 0
@@ -74,10 +65,7 @@ func (s *slice[T]) Max[K Number](fn func(T) K) K {
 	return max
 }
 
-/*
-WhereMax use the given function to select a field of each element and returns the element with the maximum value in that field, or default if the slice is empty.
-Uses slices.MinFunc
-*/
+// WhereMax returns the element whose value selected by fn is the largest, or the zero value if the slice is empty
 func (s *slice[T]) WhereMax[K Number](fn func(T) K) T {
 	if len(s.s) == 0 {
 		return *new(T)
@@ -90,9 +78,7 @@ func (s *slice[T]) WhereMax[K Number](fn func(T) K) T {
 	return slices.MaxFunc(s.s, cmp)
 }
 
-/*
-Avg returns the average of the values selected by the function, or 0 if the slice is empty
-*/
+// Avg returns the average of the values selected by fn, or 0 if the slice is empty
 func (s *slice[T]) Avg[K Number](fn func(T) K) float64 {
 	len := len(s.s)
 	if len == 0 {
@@ -106,9 +92,7 @@ func (s *slice[T]) Avg[K Number](fn func(T) K) float64 {
 	return float64(sum) / float64(len)
 }
 
-/*
-Sum returns the sum of the values selected by the function
-*/
+// Sum returns, for each group, the sum of the values selected by fn
 func (g *group[K, V]) Sum[T Number](fn func(V) T) *dictionary[K, T] {
 	result := map[K]T{}
 
@@ -119,9 +103,7 @@ func (g *group[K, V]) Sum[T Number](fn func(V) T) *dictionary[K, T] {
 	return newDictionary(result)
 }
 
-/*
-Sum returns the sum of the values selected by the function
-*/
+// Min returns, for each group, the smallest value selected by fn
 func (g *group[K, V]) Min[T Number](fn func(V) T) *dictionary[K, T] {
 	result := map[K]T{}
 
@@ -132,9 +114,7 @@ func (g *group[K, V]) Min[T Number](fn func(V) T) *dictionary[K, T] {
 	return newDictionary(result)
 }
 
-/*
-Sum returns the sum of the values selected by the function
-*/
+// Max returns, for each group, the largest value selected by fn
 func (g *group[K, V]) Max[T Number](fn func(V) T) *dictionary[K, T] {
 	result := map[K]T{}
 
@@ -145,9 +125,7 @@ func (g *group[K, V]) Max[T Number](fn func(V) T) *dictionary[K, T] {
 	return newDictionary(result)
 }
 
-/*
-Sum returns the sum of the values selected by the function
-*/
+// Avg returns, for each group, the average of the values selected by fn
 func (g *group[K, V]) Avg[T Number](fn func(V) T) *dictionary[K, float64] {
 	result := map[K]float64{}
 

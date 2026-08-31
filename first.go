@@ -1,6 +1,6 @@
 package linq2go
 
-// FirstOrNil returns the first occurrence of an element that matches the given function or nil if no element matches it
+// FirstOrNil returns a pointer to a copy of the first element matching fn, or nil if none matches
 func (s *slice[T]) FirstOrNil(fn func(T) bool) *T {
 	for _, v := range s.s {
 		if fn(v) {
@@ -11,7 +11,7 @@ func (s *slice[T]) FirstOrNil(fn func(T) bool) *T {
 	return nil
 }
 
-// FirstOrDefault returns the first occurrence of an element that matches the given function or its default value if no element matches it
+// FirstOrDefault returns the first element matching fn, or the zero value if none matches
 func (s *slice[T]) FirstOrDefault(fn func(T) bool) T {
 	for _, v := range s.s {
 		if fn(v) {

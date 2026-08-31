@@ -1,8 +1,6 @@
 package linq2go
 
-/*
-Group groups the given slice using the key selected by the groupBy function. Then it applies the fn function to each group.
-*/
+// Group gathers the elements into buckets sharing the key selected by fn
 func (s *slice[T]) Group[K comparable](fn func(T) K) *group[K, T] {
 	groups := make(map[K][]T)
 
@@ -19,7 +17,7 @@ func (s *slice[T]) Group[K comparable](fn func(T) K) *group[K, T] {
 	return newGroup(groups)
 }
 
-// GroupMap creates a new map by grouping every element of the given one into a slice sharing the same key, which is defined by the given function
+// Group gathers the values of the map into buckets sharing the key selected by fn
 func (m *dictionary[K, V]) Group[NewK comparable](fn func(key K, value V) NewK) *group[NewK, V] {
 	result := map[NewK][]V{}
 	for k, v := range m.m {

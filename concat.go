@@ -2,7 +2,7 @@ package linq2go
 
 import "slices"
 
-// Concat concatenates the given slices. Shortcut for slices.Concat, left here for retrocompatibility
+// Concat returns a new slice with values appended after the elements of this one
 func (s *slice[T]) Concat(values []T) *slice[T] {
 	return newSlice(slices.Concat(s.s, values))
 }
