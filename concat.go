@@ -4,5 +4,5 @@ import "slices"
 
 // Concat concatenates the given slices. Shortcut for slices.Concat, left here for retrocompatibility
 func (s *slice[T]) Concat(values []T) *slice[T] {
-	return FromSlice(slices.Concat(s.s, values))
+	return newSlice(slices.Concat(s.s, values))
 }

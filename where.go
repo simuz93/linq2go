@@ -10,5 +10,5 @@ func (s *slice[T]) Where(fn func(T) bool) *slice[T] {
 		}
 	}
 
-	return FromSlice(result)
+	return newSlice(result)
 }

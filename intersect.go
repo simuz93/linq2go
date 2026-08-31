@@ -4,7 +4,7 @@ package linq2go
 func (s *slice[T]) Intersect(slice []T, fn func(T, T) bool) *slice[T] {
 	result := []T{}
 
-	values := FromSlice(slice)
+	values := newSlice(slice)
 
 	for _, elem := range s.s {
 		if values.Contains(elem, fn) {
@@ -12,5 +12,5 @@ func (s *slice[T]) Intersect(slice []T, fn func(T, T) bool) *slice[T] {
 		}
 	}
 
-	return FromSlice(result)
+	return newSlice(result)
 }

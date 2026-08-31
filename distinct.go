@@ -13,5 +13,5 @@ func (s *slice[T]) Distinct[K comparable](fn func(T) K) *slice[T] {
 		}
 	}
 
-	return FromSlice(result)
+	return newSlice(result)
 }

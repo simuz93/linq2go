@@ -113,10 +113,10 @@ func (g *group[K, V]) Sum[T Number](fn func(V) T) *dictionary[K, T] {
 	result := map[K]T{}
 
 	for k, v := range g.m {
-		result[k] = FromSlice(v).Sum(fn)
+		result[k] = newSlice(v).Sum(fn)
 	}
 
-	return FromMap(result)
+	return newDictionary(result)
 }
 
 /*
@@ -126,10 +126,10 @@ func (g *group[K, V]) Min[T Number](fn func(V) T) *dictionary[K, T] {
 	result := map[K]T{}
 
 	for k, v := range g.m {
-		result[k] = FromSlice(v).Min(fn)
+		result[k] = newSlice(v).Min(fn)
 	}
 
-	return FromMap(result)
+	return newDictionary(result)
 }
 
 /*
@@ -139,10 +139,10 @@ func (g *group[K, V]) Max[T Number](fn func(V) T) *dictionary[K, T] {
 	result := map[K]T{}
 
 	for k, v := range g.m {
-		result[k] = FromSlice(v).Max(fn)
+		result[k] = newSlice(v).Max(fn)
 	}
 
-	return FromMap(result)
+	return newDictionary(result)
 }
 
 /*
@@ -152,8 +152,8 @@ func (g *group[K, V]) Avg[T Number](fn func(V) T) *dictionary[K, float64] {
 	result := map[K]float64{}
 
 	for k, v := range g.m {
-		result[k] = FromSlice(v).Avg(fn)
+		result[k] = newSlice(v).Avg(fn)
 	}
 
-	return FromMap(result)
+	return newDictionary(result)
 }

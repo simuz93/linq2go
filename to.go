@@ -1,12 +1,7 @@
 package linq2go
 
-import (
-	"maps"
-	"slices"
-)
-
 func (s *slice[T]) ToSlice() []T {
-	return slices.Clone(s.s)
+	return s.s
 }
 
 // MapFromSlice creates a map from a slice by applying the given function to each element of the slice
@@ -22,7 +17,7 @@ func (s *slice[T]) ToMap[K comparable, V any](fn func(elem T, index int) (K, V))
 }
 
 func (m *dictionary[K, V]) ToMap() map[K]V {
-	return maps.Clone(m.m)
+	return m.m
 }
 
 // MapToSlice converts a map to a slice by applying the given function to each element of the map. The resulting slice will be unordered
@@ -36,11 +31,5 @@ func (m *dictionary[K, V]) ToSlice[T any](fn func(key K, value V) T) []T {
 }
 
 func (g *group[K, V]) ToMap() map[K][]V {
-	result := map[K][]V{}
-
-	for k, v := range g.m {
-		result[k] = slices.Clone(v)
-	}
-
-	return result
+	return g.m
 }

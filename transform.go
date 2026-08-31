@@ -8,7 +8,7 @@ func (m *dictionary[K, V]) Transform[NewK comparable, NewV any](fn func(key K, v
 		result[newK] = newV
 	}
 
-	return FromMap(result)
+	return newDictionary(result)
 }
 
 // ChangeMapKey creates a new map from the given one assigning each element to the new key created by the given function

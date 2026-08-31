@@ -4,7 +4,7 @@ package linq2go
 func (s *slice[T]) Except(slice []T, fn func(T, T) bool) *slice[T] {
 	result := []T{}
 
-	values := FromSlice(slice)
+	values := newSlice(slice)
 
 	for _, elem := range s.s {
 		// All the slices must satisfy the fn condition: this means that elem isn't contained in any of the other slices
@@ -13,5 +13,5 @@ func (s *slice[T]) Except(slice []T, fn func(T, T) bool) *slice[T] {
 		}
 	}
 
-	return FromSlice(result)
+	return newSlice(result)
 }

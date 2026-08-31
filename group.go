@@ -16,7 +16,7 @@ func (s *slice[T]) Group[K comparable](fn func(T) K) *group[K, T] {
 		}
 	}
 
-	return &group[K, T]{m: groups}
+	return newGroup(groups)
 }
 
 // GroupMap creates a new map by grouping every element of the given one into a slice sharing the same key, which is defined by the given function
@@ -27,5 +27,5 @@ func (m *dictionary[K, V]) Group[NewK comparable](fn func(key K, value V) NewK) 
 		result[newK] = append(result[newK], v)
 	}
 
-	return &group[NewK, V]{m: result}
+	return newGroup(result)
 }
