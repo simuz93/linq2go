@@ -22,16 +22,7 @@ func (s *slice[T]) Min[K Number](fn func(T) K) K {
 		return 0
 	}
 
-	var min K = fn(s.s[0])
-
-	for i := 1; i < len(s.s); i++ {
-		v := fn(s.s[i])
-		if v < min {
-			min = v
-		}
-	}
-
-	return min
+	return fn(s.WhereMin(fn))
 }
 
 // WhereMin returns the element whose value selected by fn is the smallest, or the zero value if the slice is empty
@@ -53,16 +44,7 @@ func (s *slice[T]) Max[K Number](fn func(T) K) K {
 		return 0
 	}
 
-	var max K = fn(s.s[0])
-
-	for i := 1; i < len(s.s); i++ {
-		v := fn(s.s[i])
-		if v > max {
-			max = v
-		}
-	}
-
-	return max
+	return fn(s.WhereMax(fn))
 }
 
 // WhereMax returns the element whose value selected by fn is the largest, or the zero value if the slice is empty
@@ -80,16 +62,13 @@ func (s *slice[T]) WhereMax[K Number](fn func(T) K) T {
 
 // Avg returns the average of the values selected by fn, or 0 if the slice is empty
 func (s *slice[T]) Avg[K Number](fn func(T) K) float64 {
-	len := len(s.s)
-	if len == 0 {
+	l := len(s.s)
+	if l == 0 {
 		return 0
 	}
 	sum := s.Sum(fn)
-	if sum == 0 {
-		return 0
-	}
 
-	return float64(sum) / float64(len)
+	return float64(sum) / float64(l)
 }
 
 // Sum returns, for each group, the sum of the values selected by fn
