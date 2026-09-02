@@ -85,7 +85,7 @@ func (s *slice[T]) Avg[K Number](fn func(T) K) float64 {
 // Sum returns, for each group, the sum of the values selected by fn. See slice.Sum for the
 // overflow and NaN caveats
 func (g *group[K, V]) Sum[T Number](fn func(V) T) *dictionary[K, T] {
-	result := map[K]T{}
+	result := make(map[K]T, len(g.m))
 
 	for k, v := range g.m {
 		result[k] = newSlice(v).Sum(fn)
@@ -96,7 +96,7 @@ func (g *group[K, V]) Sum[T Number](fn func(V) T) *dictionary[K, T] {
 
 // Min returns, for each group, the smallest value selected by fn. See slice.Min for how NaN compares
 func (g *group[K, V]) Min[T Number](fn func(V) T) *dictionary[K, T] {
-	result := map[K]T{}
+	result := make(map[K]T, len(g.m))
 
 	for k, v := range g.m {
 		result[k] = newSlice(v).Min(fn)
@@ -107,7 +107,7 @@ func (g *group[K, V]) Min[T Number](fn func(V) T) *dictionary[K, T] {
 
 // Max returns, for each group, the largest value selected by fn. See slice.Max for how NaN compares
 func (g *group[K, V]) Max[T Number](fn func(V) T) *dictionary[K, T] {
-	result := map[K]T{}
+	result := make(map[K]T, len(g.m))
 
 	for k, v := range g.m {
 		result[k] = newSlice(v).Max(fn)
@@ -119,7 +119,7 @@ func (g *group[K, V]) Max[T Number](fn func(V) T) *dictionary[K, T] {
 // Avg returns, for each group, the average of the values selected by fn. See slice.Avg for the
 // overflow and NaN caveats
 func (g *group[K, V]) Avg[T Number](fn func(V) T) *dictionary[K, float64] {
-	result := map[K]float64{}
+	result := make(map[K]float64, len(g.m))
 
 	for k, v := range g.m {
 		result[k] = newSlice(v).Avg(fn)

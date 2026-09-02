@@ -24,11 +24,12 @@ func (m *dictionary[K, V]) ToMap() map[K]V {
 
 // ToSlice returns a slice with the value fn returns for each entry, in unspecified order
 func (m *dictionary[K, V]) ToSlice[T any](fn func(key K, value V) T) []T {
-	s := []T{}
+	s := make([]T, 0, len(m.m))
 
-	for key := range m.m {
-		s = append(s, fn(key, m.m[key]))
+	for key, value := range m.m {
+		s = append(s, fn(key, value))
 	}
+
 	return s
 }
 

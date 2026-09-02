@@ -2,7 +2,7 @@ package linq2go
 
 // Transform returns a new map with the key-value pair fn returns for each entry. On a key collision which entry survives is not predictable
 func (m *dictionary[K, V]) Transform[NewK comparable, NewV any](fn func(key K, value V) (NewK, NewV)) *dictionary[NewK, NewV] {
-	result := map[NewK]NewV{}
+	result := make(map[NewK]NewV, len(m.m))
 	for k, v := range m.m {
 		newK, newV := fn(k, v)
 		result[newK] = newV
