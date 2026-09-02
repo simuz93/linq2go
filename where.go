@@ -4,7 +4,7 @@ package linq2go
 func (s *slice[T]) Where(fn func(T) bool) *slice[T] {
 	result := []T{}
 
-	for _, v := range s.s {
+	for _, v := range s.values {
 		if fn(v) {
 			result = append(result, v)
 		}

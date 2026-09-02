@@ -2,9 +2,9 @@ package linq2go
 
 // Select returns a new slice with the value fn returns for each element
 func (s *slice[T]) Select[K any](fn func(T) K) *slice[K] {
-	result := make([]K, len(s.s))
+	result := make([]K, len(s.values))
 
-	for i, v := range s.s {
+	for i, v := range s.values {
 		result[i] = fn(v)
 	}
 
@@ -15,7 +15,7 @@ func (s *slice[T]) Select[K any](fn func(T) K) *slice[K] {
 func (s *slice[T]) SelectMany[K any](fn func(T) []K) *slice[K] {
 	result := []K{}
 
-	for _, v := range s.s {
+	for _, v := range s.values {
 		result = append(result, fn(v)...)
 	}
 

@@ -9,7 +9,7 @@ import (
 // compared with cmp.Compare, which sorts NaN before every number, so a NaN never wins
 // unless every value is one
 func (s *slice[T]) Max[K Number](fn func(T) K) K {
-	if len(s.s) == 0 {
+	if len(s.values) == 0 {
 		return 0
 	}
 
@@ -21,7 +21,7 @@ func (s *slice[T]) Max[K Number](fn func(T) K) K {
 // slices.MaxFunc, which sorts NaN before every number, so a NaN wins only when every
 // value is one
 func (s *slice[T]) WhereMax[K Number](fn func(T) K) T {
-	if len(s.s) == 0 {
+	if len(s.values) == 0 {
 		return *new(T)
 	}
 
@@ -29,14 +29,14 @@ func (s *slice[T]) WhereMax[K Number](fn func(T) K) T {
 		return cmp.Compare(fn(e1), fn(e2))
 	}
 
-	return slices.MaxFunc(s.s, compare)
+	return slices.MaxFunc(s.values, compare)
 }
 
 // Max returns, for each group, the largest value selected by fn. See slice.Max for how NaN compares
 func (g *group[K, V]) Max[T Number](fn func(V) T) *dictionary[K, T] {
-	result := make(map[K]T, len(g.m))
+	result := make(map[K]T, len(g.values))
 
-	for k, v := range g.m {
+	for k, v := range g.values {
 		result[k] = newSlice(v).Max(fn)
 	}
 

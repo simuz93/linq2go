@@ -5,7 +5,7 @@ func (s *slice[T]) Distinct[K comparable](fn func(T) K) *slice[T] {
 	distinct := make(map[K]struct{})
 	result := []T{}
 
-	for _, v := range s.s {
+	for _, v := range s.values {
 		item := fn(v)
 		if _, ok := distinct[item]; !ok {
 			distinct[item] = struct{}{}

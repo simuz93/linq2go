@@ -6,7 +6,7 @@ func (s *slice[T]) Intersect(slice []T, fn func(T, T) bool) *slice[T] {
 
 	values := newSlice(slice)
 
-	for _, elem := range s.s {
+	for _, elem := range s.values {
 		if values.Contains(elem, fn) {
 			result = append(result, elem)
 		}

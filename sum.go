@@ -6,7 +6,7 @@ package linq2go
 func (s *slice[T]) Sum[K Number](fn func(T) K) K {
 	var sum K = 0
 
-	for _, v := range s.s {
+	for _, v := range s.values {
 		sum += fn(v)
 	}
 
@@ -16,9 +16,9 @@ func (s *slice[T]) Sum[K Number](fn func(T) K) K {
 // Sum returns, for each group, the sum of the values selected by fn. See slice.Sum for the
 // overflow and NaN caveats
 func (g *group[K, V]) Sum[T Number](fn func(V) T) *dictionary[K, T] {
-	result := make(map[K]T, len(g.m))
+	result := make(map[K]T, len(g.values))
 
-	for k, v := range g.m {
+	for k, v := range g.values {
 		result[k] = newSlice(v).Sum(fn)
 	}
 
