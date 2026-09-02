@@ -1,8 +1,13 @@
 package linq2go
 
-// Skip returns a new slice without the first n elements. n is clamped to the slice bounds
+// Skip returns a new slice without the first n elements, clamping n to the slice bounds
+//
+//	FromSlice([]int{1, 2, 3}).Skip(1).ToSlice() // [2 3]
 func (s *slice[T]) Skip(n int) *slice[T] {
 	n = max(n, 0)
-	n = min(n, len(s.values))
-	return newSlice(s.values[n:])
+	l := len(s.values)
+	n = min(n, l)
+
+	// the capacity is capped so that appending to the result reallocates instead of writing into the receiver's array
+	return newSlice(s.values[n:l:l])
 }

@@ -1,6 +1,8 @@
 package linq2go
 
 // Distinct returns a new slice without duplicates, keeping the first element for each key selected by fn
+//
+//	FromSlice([]int{1, 2, 2, 3}).Distinct(func(v int) int { return v }).ToSlice() // [1 2 3]
 func (s *slice[T]) Distinct[K comparable](fn func(T) K) *slice[T] {
 	distinct := make(map[K]struct{})
 	result := []T{}

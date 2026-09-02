@@ -20,7 +20,7 @@ It is a small, dependency-light library: one package, no code generation, no ref
 **Go 1.27 or newer.** The fluent design rests on *generic methods* — methods that declare their own type parameters:
 
 ```go
-func (s *slice[T]) Select[K any](fn func(T) K) *slice[K]
+func (s *slice[T]) Select[NewT any](fn func(T) NewT) *slice[NewT]
 ```
 
 Without them, `Select` could not change the element type while staying a method, and the whole chain would collapse into nested function calls. Older toolchains reject this with `method must have no type parameters`. `go.mod` pins `go 1.27.0`, which the `go` command downloads on its own when needed.
@@ -165,7 +165,7 @@ The parts of the design that are deliberate, and the reasoning behind them.
 
 ### Copies happen once, on entry
 
-`FromSlice` and `FromMap` clone their input. Nothing downstream clones anything: operators build fresh results, `Take` and `Skip` return sub-slices of the receiver's array, and the `To*` exits return the internal storage as-is.
+`FromSlice` and `FromMap` clone their input. Nothing downstream clones anything: operators build fresh results, `Take` and `Skip` return capacity-capped sub-slices of the receiver's array (so appending to their result reallocates rather than writing into the shared array), and the `To*` exits return the internal storage as-is.
 
 ```go
 src := []int{1, 2, 3}
@@ -224,7 +224,8 @@ Always drive the tools through the `go` command, which resolves the toolchain pi
 - **The selector or predicate goes last**, and is named `fn`. Comparison-based operators take an explicit `fn func(T, T) bool` instead of constraining `T` to `comparable`.
 - **Never call `FromSlice` or `FromMap` from inside the package.** Use the internal `newSlice`/`newDictionary`/`newGroup` constructors: a `From*` call in an operator clones data that is already private, which is exactly what the design exists to avoid.
 - **Never return nil.** Initialise results as `result := []T{}` or `make([]T, 0, n)`, and guard the paths where the standard library can hand back a nil.
-- **Doc comments are one line, opening with the identifier's name**, in the style of `where.go`. No usage examples in the comment, no `/* */` blocks. Where a behaviour cannot be read off the signature, state it in a subordinate clause rather than a second paragraph.
+- **Doc comments are a concise description plus one simple usage example**, in the style of `where.go`. The description opens with the identifier's name and stays short, even when it spans lines; a behaviour that cannot be read off the signature goes in a subordinate clause or after a semicolon. The example sits after a blank comment line, tab-indented so godoc renders it as a code block, with the actual result in a trailing comment — run it before writing it down.
+- **Type parameters follow their role**: `T` for an element or a generic result, `K` and `V` for a key and a value (alone too — `Distinct[K]` selects a key, `Sum[V]` selects a value), and a `New` prefix when the receiver already binds the name (`Select[NewT]`, `Transform[NewK, NewV]`).
 - **Back performance claims with a benchmark.** Several plausible optimisations in this library measured *worse* once tried; a `-benchmem` run before and after settles it.
 - Prefer wrapping a standard library function over reimplementing it.
 

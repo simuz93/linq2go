@@ -1,6 +1,8 @@
 package linq2go
 
-// Where creates a new slice by filtering the given slice according to the given function
+// Where returns a new slice with the elements satisfying fn
+//
+//	FromSlice([]int{1, 2, 3}).Where(func(v int) bool { return v > 1 }).ToSlice() // [2 3]
 func (s *slice[T]) Where(fn func(T) bool) *slice[T] {
 	result := []T{}
 
