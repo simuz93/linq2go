@@ -10,3 +10,15 @@ func (s *slice[T]) Take(n int) *slice[T] {
 	// the capacity is capped so that appending to the result reallocates instead of writing into the receiver's array
 	return newSlice(s.values[:n:n])
 }
+
+// TakeWhile returns a new slice with the leading elements satisfying fn, stopping at the first that does not
+//
+//	FromSlice([]int{1, 2, 3, 1}).TakeWhile(func(v int) bool { return v < 3 }).ToSlice() // [1 2]
+func (s *slice[T]) TakeWhile(fn func(T) bool) *slice[T] {
+	n := 0
+	for n < len(s.values) && fn(s.values[n]) {
+		n++
+	}
+
+	return s.Take(n)
+}
