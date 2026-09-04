@@ -6,7 +6,12 @@ package linq2go
 func (s *slice[T]) FirstOrNil(fn func(T) bool) *T {
 	for _, v := range s.values {
 		if fn(v) {
-			return &v
+			// the copy is declared here and not in the loop header: a variable whose address
+			// is returned is heap-allocated where it is declared, so returning &v directly
+			// would allocate the loop variable once per element scanned instead of once per match
+			match := v
+
+			return &match
 		}
 	}
 
