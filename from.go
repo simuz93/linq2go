@@ -40,3 +40,15 @@ func FromSeq[T any](seq iter.Seq[T]) *slice[T] {
 
 	return newSlice(slices.AppendSeq(result, seq))
 }
+
+// FromSeq2 drains the given key-value sequence into a new map and wraps it; on a key
+// collision the last pair wins, and a nil sequence yields an empty map, never nil
+//
+//	FromSeq2(maps.All(map[string]int{"a": 1, "b": 2})).ToMap() // map[a:1 b:2]
+func FromSeq2[K comparable, V any](seq iter.Seq2[K, V]) *dictionary[K, V] {
+	if seq == nil {
+		return newDictionary(map[K]V{})
+	}
+
+	return newDictionary(maps.Collect(seq))
+}

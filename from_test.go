@@ -101,6 +101,55 @@ func Test_FromMap_CopiesTheInput(t *testing.T) {
 	}
 }
 
+func Test_FromSeq2(t *testing.T) {
+	tests := []struct {
+		name string
+		args iter.Seq2[string, int]
+		want map[string]int
+	}{
+		{
+			name: "Values",
+			args: maps.All(map[string]int{"a": 1, "b": 2}),
+			want: map[string]int{"a": 1, "b": 2},
+		},
+		{
+			name: "Empty",
+			args: maps.All(map[string]int{}),
+			want: map[string]int{},
+		},
+		{
+			name: "Nil",
+			args: nil,
+			want: map[string]int{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := FromSeq2(tt.args).ToMap()
+
+			if result == nil {
+				t.Fatal("FromSeq2().ToMap() = nil, want an empty map, never nil")
+			}
+			if !maps.Equal(result, tt.want) {
+				t.Errorf("FromSeq2().ToMap() = %v, want %v", result, tt.want)
+			}
+		})
+	}
+}
+
+func Test_FromSeq2_KeepsTheLastOnKeyCollision(t *testing.T) {
+	// unlike slice.ToMap, which keeps the first
+	var seq iter.Seq2[string, int] = func(yield func(string, int) bool) {
+		if yield("a", 1) {
+			yield("a", 2)
+		}
+	}
+
+	if got := FromSeq2(seq).ToMap(); !maps.Equal(got, map[string]int{"a": 2}) {
+		t.Errorf("FromSeq2().ToMap() = %v, want map[a:2]", got)
+	}
+}
+
 func Test_FromSeq(t *testing.T) {
 	tests := []struct {
 		name string

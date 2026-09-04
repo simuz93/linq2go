@@ -1,5 +1,11 @@
 package linq2go
 
+import (
+	"iter"
+	"maps"
+	"slices"
+)
+
 // ToSlice returns the wrapped slice itself, not a copy: writing to it also changes the wrapper
 //
 //	FromSlice([]int{1, 2, 3}).Where(func(v int) bool { return v > 1 }).ToSlice() // [2 3]
@@ -21,6 +27,13 @@ func (s *slice[T]) ToMap[K comparable, V any](fn func(elem T, index int) (K, V))
 	return m
 }
 
+// ToSeq returns a sequence over the elements, iterating the internal storage without copying it
+//
+//	slices.Collect(FromSlice([]int{1, 2, 3}).Where(func(v int) bool { return v > 1 }).ToSeq()) // [2 3]
+func (s *slice[T]) ToSeq() iter.Seq[T] {
+	return slices.Values(s.values)
+}
+
 // ToMap returns the wrapped map itself, not a copy: writing to it also changes the wrapper
 //
 //	FromMap(map[string]int{"a": 1}).ToMap() // map[a:1]
@@ -39,6 +52,13 @@ func (d *dictionary[K, V]) ToSlice[T any](fn func(key K, value V) T) []T {
 	}
 
 	return s
+}
+
+// ToSeq returns a sequence over the key-value pairs, in unspecified order
+//
+//	maps.Collect(FromMap(map[string]int{"a": 1}).ToSeq()) // map[a:1]
+func (d *dictionary[K, V]) ToSeq() iter.Seq2[K, V] {
+	return maps.All(d.values)
 }
 
 // ToMap returns the wrapped map of buckets itself, not a copy: writing to it also changes the wrapper

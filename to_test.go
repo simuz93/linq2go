@@ -182,3 +182,81 @@ func Test_ToSlice_ReturnsTheInternalStorage(t *testing.T) {
 		t.Errorf("writing through a derived ToSlice() was not visible through the base: got %v, want [1 42 3]", got)
 	}
 }
+
+func Test_ToSeq_Slice(t *testing.T) {
+	tests := []struct {
+		name string
+		args []int
+		want []int
+	}{
+		{
+			name: "Values",
+			args: []int{1, 2, 3},
+			want: []int{1, 2, 3},
+		},
+		{
+			name: "Empty",
+			args: []int{},
+			want: []int{},
+		},
+		{
+			name: "Nil",
+			args: nil,
+			want: []int{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			seq := FromSlice(tt.args).ToSeq()
+
+			if seq == nil {
+				t.Fatal("ToSeq() = nil, want a sequence, never nil")
+			}
+
+			result := []int{}
+			for v := range seq {
+				result = append(result, v)
+			}
+			if !slices.Equal(result, tt.want) {
+				t.Errorf("ToSeq() yielded %v, want %v", result, tt.want)
+			}
+		})
+	}
+}
+
+func Test_ToSeq_Dictionary(t *testing.T) {
+	tests := []struct {
+		name string
+		args map[string]int
+		want map[string]int
+	}{
+		{
+			name: "Values",
+			args: map[string]int{"a": 1, "b": 2},
+			want: map[string]int{"a": 1, "b": 2},
+		},
+		{
+			name: "Empty",
+			args: map[string]int{},
+			want: map[string]int{},
+		},
+		{
+			name: "Nil",
+			args: nil,
+			want: map[string]int{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			seq := FromMap(tt.args).ToSeq()
+
+			if seq == nil {
+				t.Fatal("ToSeq() = nil, want a sequence, never nil")
+			}
+
+			if result := maps.Collect(seq); !maps.Equal(result, tt.want) {
+				t.Errorf("ToSeq() yielded %v, want %v", result, tt.want)
+			}
+		})
+	}
+}
