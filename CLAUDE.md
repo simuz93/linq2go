@@ -63,7 +63,9 @@ operator.
 | `group.go` | `slice.Group`, `dictionary.Group` |
 | `transform.go` | `dictionary.Transform`, `dictionary.ChangeKey` |
 | `first.go` | `FirstOrNil`, `FirstOrDefault` |
-| the rest | one `slice` method each: `where`, `distinct`, `take`, `skip`, `concat`, `except`, `intersect`, `contains`, `any`, `all` |
+| `where.go` | `slice.Where`, `dictionary.Where`, `group.Where` |
+| `count.go` | `slice.Count`, `dictionary.Count`, `group.Count` |
+| the rest | one `slice` method each: `distinct`, `take`, `skip`, `concat`, `except`, `intersect`, `contains`, `any`, `all` |
 
 Three **unexported** wrapper types, each a single field around a plain Go value:
 
@@ -79,8 +81,8 @@ The flow is a closed loop: **enter** (`from.go`) → **chain** (every intermedia
 freshly allocated wrapper; receivers are never mutated) → **exit** (`to.go`, `values.go`, or a
 terminal operator in `sum`/`min`/`max`/`avg`/`first`/`any`/`all`/`contains`).
 
-A `group` exits only through `ToMap` and the four aggregations, which return a `*dictionary[K, NewV]`
-keyed by group. They re-wrap each bucket with `newSlice(v)` and delegate to the `slice` version —
+A `group` chains only through `Where` (a filter over whole buckets) and exits through `ToMap`,
+`Count` and the four aggregations, which return a `*dictionary[K, NewV]` keyed by group. They re-wrap each bucket with `newSlice(v)` and delegate to the `slice` version —
 keep that delegation when adding a group operator instead of duplicating the loop body. It costs
 nothing (measured: escape analysis keeps the wrapper on the stack) and it is what stops `group.Min`
 and `slice.Min` from drifting apart.
@@ -121,8 +123,12 @@ over without a nil check. When adding an operator, check every early-return path
   a role whose name the receiver already binds (`Select[NewT]`, `Transform[NewK, NewV]`, the group
   aggregations `[NewV Number]`).
 - Wrap the standard library where it already does the job (`Any` → `slices.ContainsFunc`,
-  `WhereMin`/`WhereMax` → `slices.MinFunc`/`MaxFunc`, `Concat` → `slices.Concat`, the entry copies →
-  `slices.Clone`/`maps.Clone`) instead of reimplementing it.
+  `Concat` → `slices.Concat`, the entry copies → `slices.Clone`/`maps.Clone`) instead of
+  reimplementing it. `Min`/`Max`/`WhereMin`/`WhereMax` are the accepted exception: they left
+  `slices.MinFunc`/`MaxFunc` because MinFunc evaluates `fn` twice per comparison (2,3× slower with
+  a costly selector) and `slices.Min`/`Max` would need an allocated projection and change the NaN
+  semantics. `Min`/`Max` are single-pass loops returning index and value with `fn` called exactly
+  once per element; `WhereMin`/`WhereMax` reuse the index. Keep the two loops mirrored.
 - **Doc comments: a concise description plus one simple usage example**, in the style of
   `where.go`. The description opens with the identifier's name and stays short — it may span lines,
   but keep it tight, not prolix; where behaviour cannot be read off the signature, say it in a
@@ -136,12 +142,13 @@ over without a nil check. When adding an operator, check every early-return path
 
 Check this list before "fixing" one of them:
 
-- **Empty input yields the zero value.** `Min`/`Max`/`Avg` return `0`, `WhereMin`/`WhereMax` return
-  `*new(T)`, `FirstOrDefault` returns the zero value. The library has no way to say "there is
-  nothing"; `FirstOrNil` is the one exception, and it returns a pointer to a *copy*.
-- **`NaN` follows `cmp.Compare`, not `slices.Min`/`Max`.** `WhereMin`/`WhereMax` compare through
-  `slices.MinFunc`/`MaxFunc`, and `cmp.Compare` sorts `NaN` below every number: a single `NaN` wins
-  a minimum and never wins a maximum. `Sum` and `Avg` do plain arithmetic, so one `NaN` poisons both.
+- **Empty input yields the zero value, next to a `-1` index.** `Min`/`Max` return `-1` and `0`,
+  `WhereMin`/`WhereMax` return `-1` and `*new(T)`, `Avg` returns `0`, `FirstOrDefault` returns the
+  zero value. "There is nothing" is signalled by that `-1` index, or by `FirstOrNil` (nil, otherwise
+  a pointer to a *copy*); `Avg` and `FirstOrDefault` stay ambiguous by choice.
+- **`NaN` follows `cmp.Compare`, not `slices.Min`/`Max`.** `Min` and `Max` compare with
+  `cmp.Compare`, which sorts `NaN` below every number: a single `NaN` wins a minimum and never wins
+  a maximum. `Sum` and `Avg` do plain arithmetic, so one `NaN` poisons both.
 - **`Sum` accumulates in `V`**, the type `fn` returns, so a narrow integer overflows silently and
   `Avg` inherits the wrong total.
 - **`Transform` and `ChangeKey` are not deterministic on key collisions.** The survivor depends on

@@ -44,7 +44,7 @@ evens := linq2go.FromSlice([]int{1, 2, 3, 4, 5, 6}).
 ```
 
 **Enter** — `FromSlice`, `FromMap`, `FromSeq` (from an `iter.Seq`).
-**Exit** — `ToSlice`, `ToMap`, `Values`, or a terminal operator: `Sum`, `Min`, `Max`, `Avg`, `WhereMin`, `WhereMax`, `Any`, `All`, `Contains`, `FirstOrNil`, `FirstOrDefault`.
+**Exit** — `ToSlice`, `ToMap`, `Values`, or a terminal operator: `Sum`, `Min`, `Max`, `Avg`, `WhereMin`, `WhereMax`, `Any`, `All`, `Contains`, `Count`, `FirstOrNil`, `FirstOrDefault`.
 
 ### Grouping and aggregating
 
@@ -70,9 +70,11 @@ byRegion.Max(func(s sale) float64 { return s.Amount }).ToMap() // map[north:100 
 `WhereMin` and `WhereMax` are the pair that returns the *element* rather than the value — the cheapest way to answer "which one is the largest?":
 
 ```go
-biggest := linq2go.FromSlice(sales).WhereMax(func(s sale) float64 { return s.Amount })
+_, biggest := linq2go.FromSlice(sales).WhereMax(func(s sale) float64 { return s.Amount })
 // sale{Region: "south", Amount: 250}
 ```
+
+Like `Min` and `Max`, they return the index first, `-1` on an empty input — the unambiguous way to tell "the smallest is 0" apart from "there is nothing".
 
 ### Working with maps
 
@@ -137,23 +139,27 @@ linq2go.FromSeq(squares).Sum(func(v int) int { return v }) // 55
 | `Except(values, fn)` / `Intersect(values, fn)` | excludes / keeps what `fn` matches |
 | `Contains(value, fn)` | whether any element matches, as `fn(value, element)` |
 | `Group(fn)` | buckets sharing the key `fn` selects |
-| `Sum` `Min` `Max` `Avg` | numeric reductions over the selected value |
-| `WhereMin` `WhereMax` | the *element* holding the smallest / largest value |
+| `Sum` / `Avg` | numeric reductions over the selected value |
+| `Min(fn)` / `Max(fn)` | index and value of the smallest / largest selected value, `-1` and `0` when empty |
+| `WhereMin` `WhereMax` | index and *element* holding the smallest / largest value, `-1` and the zero value when empty |
 | `Any(fn)` / `All(fn)` | whether some / every element matches |
 | `FirstOrNil(fn)` / `FirstOrDefault(fn)` | first match, as a pointer to a copy / as a value |
+| `Count()` | the number of elements |
 | `ToSlice()` / `ToMap(fn)` | exit |
 
 **On a map**
 
 | Operator | Result |
 |---|---|
+| `Where(fn)` | keeps the entries matching `fn` |
 | `Select(fn)` | a new value for each key |
 | `Transform(fn)` | a new key **and** value for each entry |
 | `ChangeKey(fn)` | re-keys, values untouched |
 | `Group(fn)` | buckets the values by a new key |
+| `Count()` | the number of entries |
 | `Values()` / `ToSlice(fn)` / `ToMap()` | exit |
 
-**On a group** — `Sum`, `Min`, `Max`, `Avg`, each returning a map keyed by group, plus `ToMap`.
+**On a group** — `Where(fn)` to filter whole buckets, `Sum`, `Min`, `Max`, `Avg`, each returning a map keyed by group, plus `Count` and `ToMap`.
 
 ## Design notes
 
@@ -184,7 +190,7 @@ A `nil` input, a filter that discards everything, a `Concat` of two empty slices
 
 ### The standard library does the work where it can
 
-`Any` is `slices.ContainsFunc`, `WhereMin`/`WhereMax` are `slices.MinFunc`/`MaxFunc`, `Concat` is `slices.Concat`, the entry copies are `slices.Clone`/`maps.Clone`. Reimplementing them would mean maintaining a second set of edge cases and diverging from what a Go reader already expects. It also means the library inherits their semantics — see `NaN` below.
+`Any` is `slices.ContainsFunc`, `Concat` is `slices.Concat`, the entry copies are `slices.Clone`/`maps.Clone`. Reimplementing them would mean maintaining a second set of edge cases and diverging from what a Go reader already expects. It also means the library inherits their semantics — see `NaN` below. The one deliberate exception is `Min`/`Max`/`WhereMin`/`WhereMax`: `slices.MinFunc` evaluates the selector twice per comparison, so `Min` and `Max` are a single pass that calls `fn` exactly once per element and returns index and value, with the same ordering, ties and `NaN` behaviour; `WhereMin`/`WhereMax` reuse the index.
 
 ### Sizes are pre-allocated only when they are exactly known
 
@@ -198,7 +204,7 @@ No laziness — every operator runs eagerly and materialises its result; there i
 
 Documented, deliberate, and easy to mistake for bugs:
 
-- **Empty input gives the zero value.** `Min`/`Max`/`Avg` return `0` and `FirstOrDefault` returns the zero value — indistinguishable from a legitimate result. `FirstOrNil` is the exception, returning a pointer to a copy, or `nil`.
+- **Empty input gives the zero value.** `Min`/`Max`/`WhereMin`/`WhereMax` return `-1` next to it, the unambiguous signal; `Avg` returns `0` and `FirstOrDefault` returns the zero value, both indistinguishable from a legitimate result — `FirstOrNil` is the unambiguous variant there.
 - **`NaN` follows `cmp.Compare`**, which sorts it below every number: a single `NaN` wins a minimum and never wins a maximum, while `Sum` and `Avg` propagate it like plain Go arithmetic. Note this differs from `slices.Min`/`slices.Max`, which propagate `NaN` in both directions.
 - **`Sum` accumulates in the type `fn` returns**, so a narrow integer overflows silently, and `Avg` inherits the wrong total.
 - **`Transform` and `ChangeKey` are not deterministic on key collisions** — the survivor depends on Go's randomized map iteration order, and is not stable between runs. `slice.ToMap` instead keeps the first occurrence.
