@@ -18,10 +18,10 @@ func (s *slice[T]) Where(fn func(T) bool) *slice[T] {
 // Where returns a new dictionary with the elements satisfying fn
 //
 //	FromMap(map[string]int{"a": 1, "b": 2}).Where(func(k string, v int) bool { return v%2 == 0 }).ToMap() // map[b:2]
-func (m *dictionary[K, V]) Where(fn func(K, V) bool) *dictionary[K, V] {
+func (d *dictionary[K, V]) Where(fn func(K, V) bool) *dictionary[K, V] {
 	result := map[K]V{}
 
-	for k, v := range m.values {
+	for k, v := range d.values {
 		if fn(k, v) {
 			result[k] = v
 		}

@@ -17,9 +17,9 @@ func (s *slice[T]) Group[K comparable](fn func(T) K) *group[K, T] {
 // Group gathers the values of the map into buckets sharing the key selected by fn
 //
 //	FromMap(map[string]int{"a": 1, "b": 2}).Group(func(k string, v int) bool { return v%2 == 0 }).ToMap() // map[false:[1] true:[2]]
-func (m *dictionary[K, V]) Group[NewK comparable](fn func(key K, value V) NewK) *group[NewK, V] {
+func (d *dictionary[K, V]) Group[NewK comparable](fn func(key K, value V) NewK) *group[NewK, V] {
 	result := map[NewK][]V{}
-	for k, v := range m.values {
+	for k, v := range d.values {
 		newK := fn(k, v)
 		result[newK] = append(result[newK], v)
 	}

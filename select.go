@@ -29,6 +29,6 @@ func (s *slice[T]) SelectMany[NewT any](fn func(T) []NewT) *slice[NewT] {
 // Select returns a new map with the same keys and the value fn returns for each entry
 //
 //	FromMap(map[string]int{"a": 1}).Select(func(k string, v int) int { return v * 10 }).ToMap() // map[a:10]
-func (m *dictionary[K, V]) Select[NewV any](fn func(key K, value V) NewV) *dictionary[K, NewV] {
-	return m.Transform(func(k K, v V) (K, NewV) { return k, fn(k, v) })
+func (d *dictionary[K, V]) Select[NewV any](fn func(key K, value V) NewV) *dictionary[K, NewV] {
+	return d.Transform(func(k K, v V) (K, NewV) { return k, fn(k, v) })
 }

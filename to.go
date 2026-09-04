@@ -24,17 +24,17 @@ func (s *slice[T]) ToMap[K comparable, V any](fn func(elem T, index int) (K, V))
 // ToMap returns the wrapped map itself, not a copy: writing to it also changes the wrapper
 //
 //	FromMap(map[string]int{"a": 1}).ToMap() // map[a:1]
-func (m *dictionary[K, V]) ToMap() map[K]V {
-	return m.values
+func (d *dictionary[K, V]) ToMap() map[K]V {
+	return d.values
 }
 
 // ToSlice returns a slice with the value fn returns for each entry, in unspecified order
 //
 //	FromMap(map[string]int{"a": 1, "b": 2}).ToSlice(func(k string, v int) int { return v }) // [1 2], in any order
-func (m *dictionary[K, V]) ToSlice[T any](fn func(key K, value V) T) []T {
-	s := make([]T, 0, len(m.values))
+func (d *dictionary[K, V]) ToSlice[T any](fn func(key K, value V) T) []T {
+	s := make([]T, 0, len(d.values))
 
-	for key, value := range m.values {
+	for key, value := range d.values {
 		s = append(s, fn(key, value))
 	}
 
