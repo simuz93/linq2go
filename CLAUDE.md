@@ -142,10 +142,10 @@ over without a nil check. When adding an operator, check every early-return path
 
 Check this list before "fixing" one of them:
 
-- **Empty input yields the zero value, next to a `-1` index.** `Min`/`Max` return `-1` and `0`,
-  `WhereMin`/`WhereMax` return `-1` and `*new(T)`, `Avg` returns `0`, `FirstOrDefault` returns the
-  zero value. "There is nothing" is signalled by that `-1` index, or by `FirstOrNil` (nil, otherwise
-  a pointer to a *copy*); `Avg` and `FirstOrDefault` stay ambiguous by choice.
+- **Empty input signals itself, except in `FirstOrDefault`.** `Min`/`Max` return `-1` and `0`,
+  `WhereMin`/`WhereMax` return `-1` and `*new(T)`, `Avg` returns `NaN` (the arithmetic 0/0),
+  `FirstOrNil` returns nil (otherwise a pointer to a *copy*). Only `FirstOrDefault` stays ambiguous
+  by choice, returning a zero value indistinguishable from a legitimate result.
 - **`NaN` follows `cmp.Compare`, not `slices.Min`/`Max`.** `Min` and `Max` compare with
   `cmp.Compare`, which sorts `NaN` below every number: a single `NaN` wins a minimum and never wins
   a maximum. `Sum` and `Avg` do plain arithmetic, so one `NaN` poisons both.

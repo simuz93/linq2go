@@ -204,7 +204,7 @@ No laziness — every operator runs eagerly and materialises its result; there i
 
 Documented, deliberate, and easy to mistake for bugs:
 
-- **Empty input gives the zero value.** `Min`/`Max`/`WhereMin`/`WhereMax` return `-1` next to it, the unambiguous signal; `Avg` returns `0` and `FirstOrDefault` returns the zero value, both indistinguishable from a legitimate result — `FirstOrNil` is the unambiguous variant there.
+- **Empty input signals itself.** `Min`/`Max`/`WhereMin`/`WhereMax` return a `-1` index next to the zero value, `Avg` returns `NaN` (the arithmetic 0/0) and `FirstOrNil` returns `nil`. The one deliberate exception is `FirstOrDefault`, whose zero value is indistinguishable from a legitimate result.
 - **`NaN` follows `cmp.Compare`**, which sorts it below every number: a single `NaN` wins a minimum and never wins a maximum, while `Sum` and `Avg` propagate it like plain Go arithmetic. Note this differs from `slices.Min`/`slices.Max`, which propagate `NaN` in both directions.
 - **`Sum` accumulates in the type `fn` returns**, so a narrow integer overflows silently, and `Avg` inherits the wrong total.
 - **`Transform` and `ChangeKey` are not deterministic on key collisions** — the survivor depends on Go's randomized map iteration order, and is not stable between runs. `slice.ToMap` instead keeps the first occurrence.
