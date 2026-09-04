@@ -58,3 +58,14 @@ func Test_Intersect(t *testing.T) {
 		})
 	}
 }
+
+func Test_Intersect_CallsFnWithTheElementFirst(t *testing.T) {
+	// an asymmetric fn pins the documented argument order: fn(element, value)
+	fn := func(element, value int) bool { return element == value*10 }
+
+	result := FromSlice([]int{10, 2, 30}).Intersect([]int{1, 3}, fn).ToSlice()
+
+	if want := []int{10, 30}; !slices.Equal(result, want) {
+		t.Errorf("Intersect().ToSlice() = %v, want %v", result, want)
+	}
+}
