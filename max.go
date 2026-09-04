@@ -1,38 +1,37 @@
 package linq2go
 
-import (
-	"cmp"
-	"slices"
-)
+import "cmp"
 
-// Max returns the largest value selected by fn, or 0 if the slice is empty, comparing
-// with cmp.Compare, which sorts NaN before every number so a NaN never wins unless every
-// value is one
+// Max returns the index and the largest value selected by fn, calling it once per
+// element, or -1 and 0 if the slice is empty; values compare with cmp.Compare, which
+// sorts NaN before every number so a NaN never wins unless every value is one
 //
-//	FromSlice([]int{1, 5, 3}).Max(func(v int) int { return v }) // 5
-func (s *slice[T]) Max[V Number](fn func(T) V) V {
-	if len(s.values) == 0 {
-		return 0
+//	FromSlice([]int{1, 5, 3}).Max(func(v int) int { return v }) // 1, 5
+func (s *slice[T]) Max[V Number](fn func(T) V) (int, V) {
+	bestIdx := -1
+	var best V
+
+	for i, e := range s.values {
+		// the strict comparison keeps the first of equal maxima
+		if v := fn(e); bestIdx < 0 || cmp.Compare(v, best) > 0 {
+			bestIdx, best = i, v
+		}
 	}
 
-	return fn(s.WhereMax(fn))
+	return bestIdx, best
 }
 
-// WhereMax returns the element whose value selected by fn is the largest, or the zero
-// value if the slice is empty, comparing through slices.MaxFunc with cmp.Compare, which
-// sorts NaN before every number so a NaN wins only when every value is one
+// WhereMax returns the index and the element whose value selected by fn is the largest,
+// or -1 and the zero value if the slice is empty
 //
-//	FromSlice([]string{"go", "linq"}).WhereMax(func(s string) int { return len(s) }) // "linq"
-func (s *slice[T]) WhereMax[V Number](fn func(T) V) T {
-	if len(s.values) == 0 {
-		return *new(T)
+//	FromSlice([]string{"go", "linq"}).WhereMax(func(s string) int { return len(s) }) // 1, "linq"
+func (s *slice[T]) WhereMax[V Number](fn func(T) V) (int, T) {
+	idx, _ := s.Max(fn)
+	if idx < 0 {
+		return -1, *new(T)
 	}
 
-	compare := func(e1 T, e2 T) int {
-		return cmp.Compare(fn(e1), fn(e2))
-	}
-
-	return slices.MaxFunc(s.values, compare)
+	return idx, s.values[idx]
 }
 
 // Max returns, for each group, the largest value selected by fn, comparing NaN as slice.Max does
@@ -42,7 +41,7 @@ func (g *group[K, V]) Max[NewV Number](fn func(V) NewV) *dictionary[K, NewV] {
 	result := make(map[K]NewV, len(g.values))
 
 	for k, v := range g.values {
-		result[k] = newSlice(v).Max(fn)
+		_, result[k] = newSlice(v).Max(fn)
 	}
 
 	return newDictionary(result)
