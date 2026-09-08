@@ -94,6 +94,7 @@ family's file — the test is whether a reader hunting for it would look under t
 
 | file | contents |
 |---|---|
+| `doc.go` | the package comment — the landing text on pkg.go.dev; nothing else |
 | `types.go` | the three wrappers, plus `newSlice` / `newDictionary` / `newGroup` |
 | `interfaces.go` | the `Number` constraint, nothing else |
 | `functions.go` | `Self` and `Equal`, the two ready-made `fn` arguments |
@@ -112,8 +113,8 @@ family's file — the test is whether a reader hunting for it would look under t
 | `count.go` | `slice.Count`, `dictionary.Count`, `group.Count` |
 | the rest | one `slice` method each: `distinct`, `concat`, `except`, `intersect`, `contains`, `any`, `all` |
 
-Every file has a matching `_test.go`, except `types.go` and `interfaces.go`, which hold no
-behaviour of their own.
+Every file has a matching `_test.go`, except `doc.go`, `types.go` and `interfaces.go`, which
+hold no behaviour of their own.
 
 ## Invariants an edit must not break
 
