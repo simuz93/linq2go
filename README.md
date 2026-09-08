@@ -1,5 +1,8 @@
 # linq2go
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/simuz93/linq2go.svg)](https://pkg.go.dev/github.com/simuz93/linq2go)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 LINQ-style fluent queries for Go slices and maps.
 
 Go's standard library gives you `slices` and `maps`, but chaining them means naming an intermediate variable at every step. `linq2go` wraps a slice or a map once, lets you chain operators on it, and hands you a plain Go value back at the end.
@@ -237,7 +240,10 @@ Documented, deliberate, and easy to mistake for bugs:
 
 ## Contributing
 
-Issues and pull requests are welcome.
+**Outside contributions are not being accepted yet.** The library is settling before its first
+tagged release, so issues and pull requests are closed for the moment — they will open shortly,
+and the guidelines below are already the ones a contribution will be held to. Until then, the
+code is public to read, use and fork.
 
 ```sh
 go build ./...
@@ -262,4 +268,4 @@ Always drive the tools through the `go` command, which resolves the toolchain pi
 
 ## License
 
-Not yet chosen — add a `LICENSE` file before publishing.
+Released under the [MIT License](LICENSE). © 2026 Simone Serra.
