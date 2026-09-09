@@ -1,0 +1,49 @@
+name: Build and Test
+
+on:
+  pull_request:
+
+# The workflow only reads the code; nothing it does needs a writable token.
+permissions:
+  contents: read
+
+# A new push to the same pull request supersedes the run already in flight.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: build, vet and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # go-version-file reads the `go` directive from go.mod, so the toolchain
+      # here is the one the module pins and never drifts from it.
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      # The gofmt from GOROOT, never a bare `gofmt`: that one is whichever the
+      # PATH resolves first, and a gofmt from an older Go rejects every generic
+      # method in this package with `method must have no type parameters`.
+      # `go env` resolves the toolchain go.mod pins, so this is always its own.
+      - name: Gofmt
+        run: |
+          unformatted=$("$(go env GOROOT)/bin/gofmt" -l .)
+          if [ -n "$unformatted" ]; then
+            echo "These files are not gofmt'd:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: Test
+        run: go test -race -cover ./...
