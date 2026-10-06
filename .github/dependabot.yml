@@ -1,0 +1,19 @@
+# Dependabot opens a pull request when a dependency has a newer version. The
+# pull request goes through the same CI and review as any other.
+version: 2
+updates:
+  # The actions pinned in .github/workflows: checkout, setup-go.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    # One pull request for every action that moved, not one per action.
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # go.mod: a single dependency, golang.org/x/exp.
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: monthly
