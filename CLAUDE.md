@@ -300,6 +300,10 @@ Two workflows use temporary files that must not be committed:
 
 - `README.md` — for users and contributors: description, examples, operator tables, design
   rationale, contributing guidelines. English.
+- `CONTRIBUTING.md` — the mechanics of a contribution only (issue first, fork, PR, CI, review);
+  the guidelines themselves stay in README. `SECURITY.md` — private vulnerability reporting.
+- `.github/` — CI workflow, `CODEOWNERS`, `PULL_REQUEST_TEMPLATE.md` (its checklist mirrors the
+  conventions above: a new convention here is a new line there), `dependabot.yml`.
 - `CLAUDE.md` — this file: only what is needed to work on the code here. English.
 
 A change in library behaviour usually touches four places: the doc comment, its test, README's
