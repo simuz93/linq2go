@@ -241,10 +241,9 @@ Documented, deliberate, and easy to mistake for bugs:
 
 ## Contributing
 
-**Outside contributions are not being accepted yet.** The library is settling before its first
-tagged release, so issues and pull requests are closed for the moment — they will open shortly,
-and the guidelines below are already the ones a contribution will be held to. Until then, the
-code is public to read, use and fork.
+Contributions are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the mechanics — issue first for
+anything beyond a small fix, fork, pull request against `main`, CI and review — and the guidelines
+below are what a change is held to.
 
 ```sh
 go build ./...
