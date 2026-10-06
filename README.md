@@ -1,5 +1,6 @@
 # linq2go
 
+[![Build and Test](https://github.com/simuz93/linq2go/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/simuz93/linq2go/actions/workflows/build-and-test.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/simuz93/linq2go.svg)](https://pkg.go.dev/github.com/simuz93/linq2go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 

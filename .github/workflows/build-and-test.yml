@@ -1,13 +1,18 @@
 name: Build and Test
 
+# Pull requests are gated by this run through the ruleset; the push run keeps
+# main itself checked and feeds the badge in README.md.
 on:
   pull_request:
+  push:
+    branches: [main]
 
 # The workflow only reads the code; nothing it does needs a writable token.
 permissions:
   contents: read
 
-# A new push to the same pull request supersedes the run already in flight.
+# A new push to the same pull request, or to main, supersedes the run already
+# in flight.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
