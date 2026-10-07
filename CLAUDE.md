@@ -69,15 +69,18 @@ The flow is a closed loop: **enter** (`from.go`) → **chain** (every intermedia
 freshly allocated wrapper; receivers are never mutated) → **exit** (`to.go`, `values.go`/`keys.go`,
 or a terminal operator in `sum`/`min`/`max`/`avg`/`first`/`last`/`any`/`all`/`contains`/`count`).
 
-A `group` chains only through `Where` (a filter over whole buckets) and exits through `ToMap`,
-`Count` and the four aggregations, which return a `*dictionary[K, NewV]` keyed by group.
+A `group` chains only through `Where` (a filter over whole buckets) and exits through `ToMap`
+and the five aggregations — `Sum`/`Min`/`Max`/`Avg`/`Count` — which return a `*dictionary`
+keyed by group. `group.Count` is per bucket, as the others are, not the number of buckets
+(that is `Count().Count()`); this diverges from LINQ, where `Count()` on a `GroupBy` counts
+the groups, and was chosen for consistency with the other four.
 
 **Delegate to the primitive instead of duplicating its loop.** This is the pattern that keeps
 mirrored code from drifting, and it is used throughout:
 
 | this | delegates to |
 |---|---|
-| the four `group` aggregations | `newSlice(bucket).Sum/Min/Max/Avg(fn)` |
+| the five `group` aggregations | `newSlice(bucket).Sum/Min/Max/Avg(fn)` / `Count()` |
 | `slice.TakeWhile` / `SkipWhile` | `Take` / `Skip` (which own the capacity capping) |
 | `slice.WhereMin` / `WhereMax` | `Min` / `Max` (reusing the returned index) |
 | `dictionary.Select`, `ChangeKey` | `Transform` |
@@ -194,6 +197,8 @@ Check this list before "fixing" one of them:
 - **`Except` and `Intersect` keep duplicates.** They include or exclude values, they do not build a
   set; chain `Distinct` for that. This diverges from LINQ. They are also **O(n·m)** by construction:
   equality comes from `fn`, so there is no set to hash into. That is the design, not an oversight.
+- **`group.Count` counts per bucket**, like the other four aggregations, not the number of
+  groups (`Count().Count()`). LINQ counts the groups; the divergence is deliberate.
 - **`slice.ToMap` keeps the first element** on a key collision, unlike the map operators above;
   `FromSeq2` keeps the **last** pair, as `maps.Collect` does.
 - **`dictionary.ToSlice`, `Values`, `Keys` and `dictionary.ToSeq` return an unordered result**,

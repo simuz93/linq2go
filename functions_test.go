@@ -84,8 +84,8 @@ func Test_Self_AtTheSelectorOperators(t *testing.T) {
 	if idx, got := FromSlice([]int{1, 5, 3}).Max(Self); idx != 1 || got != 5 {
 		t.Errorf("Max(Self) = %v, %v, want 1, 5", idx, got)
 	}
-	if got := FromSlice([]int{1, 1, 2}).Group(Self).Count(); got != 2 {
-		t.Errorf("Group(Self).Count() = %v, want 2", got)
+	if got := FromSlice([]int{1, 1, 2}).Group(Self).Count().Count(); got != 2 {
+		t.Errorf("Group(Self).Count().Count() = %v, want 2", got)
 	}
 }
 

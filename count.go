@@ -14,9 +14,16 @@ func (d *dictionary[K, V]) Count() int {
 	return len(d.values)
 }
 
-// Count returns the number of key-value pairs in the group
+// Count returns, for each group, the number of values in it; chain a second Count
+// for the number of groups
 //
-//	FromMap(map[string]int{"a": 2, "b": 4}).Group(func(k string, v int) bool { return v%2 == 0 }).Count() // 1
-func (g *group[K, V]) Count() int {
-	return len(g.values)
+//	FromSlice([]int{1, 2, 3, 4, 6}).Group(func(v int) bool { return v%2 == 0 }).Count().ToMap() // map[false:2 true:3]
+func (g *group[K, V]) Count() *dictionary[K, int] {
+	result := make(map[K]int, len(g.values))
+
+	for k, v := range g.values {
+		result[k] = newSlice(v).Count()
+	}
+
+	return newDictionary(result)
 }

@@ -1,6 +1,9 @@
 package linq2go
 
-import "testing"
+import (
+	"maps"
+	"testing"
+)
 
 func Test_Count_Slice(t *testing.T) {
 	tests := []struct {
@@ -72,31 +75,35 @@ func Test_Count_Group(t *testing.T) {
 	tests := []struct {
 		name string
 		args []int
-		want int
+		want map[bool]int
 	}{
 		{
 			name: "Values",
-			args: []int{1, 2, 3, 4},
-			want: 2,
+			args: []int{1, 2, 3, 4, 6},
+			want: map[bool]int{false: 2, true: 3},
 		},
 		{
 			name: "Empty",
 			args: []int{},
-			want: 0,
+			want: map[bool]int{},
 		},
 		{
 			name: "Nil",
 			args: nil,
-			want: 0,
+			want: map[bool]int{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fn := func(v int) bool { return v%2 == 0 }
 
-			result := FromSlice(tt.args).Group(fn).Count()
+			result := FromSlice(tt.args).Group(fn).Count().ToMap()
 
-			if result != tt.want {
+			if result == nil {
+				t.Fatal("Count() returned nil")
+			}
+
+			if !maps.Equal(result, tt.want) {
 				t.Errorf("Count() = %v, want %v", result, tt.want)
 			}
 		})

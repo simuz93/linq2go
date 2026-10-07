@@ -183,7 +183,7 @@ linq2go.FromSeq(squares).Sum(func(v int) int { return v }) // 55
 | `Count()` | the number of entries |
 | `Values()` / `Keys()` / `ToSlice(fn)` / `ToMap()` / `ToSeq()` | exit |
 
-**On a group** — `Where(fn)` to filter whole buckets, `Sum`, `Min`, `Max`, `Avg`, each returning a map keyed by group, plus `Count` and `ToMap`.
+**On a group** — `Where(fn)` to filter whole buckets, `Sum`, `Min`, `Max`, `Avg` and `Count`, each returning a map keyed by group, plus `ToMap`. The number of groups is `Count().Count()`.
 
 ## Design notes
 
@@ -236,6 +236,7 @@ Documented, deliberate, and easy to mistake for bugs:
 - **`NaN` follows `cmp.Compare`**, which sorts it below every number: a single `NaN` wins a minimum and never wins a maximum, `OrderBy` puts it first and `OrderByDescending` last, while `Sum` and `Avg` propagate it like plain Go arithmetic. Note this differs from `slices.Min`/`slices.Max`, which propagate `NaN` in both directions.
 - **`Sum` accumulates in the type `fn` returns**, so a narrow integer overflows silently, and `Avg` inherits the wrong total.
 - **`Transform` and `ChangeKey` are not deterministic on key collisions** — the survivor depends on Go's randomized map iteration order, and is not stable between runs. `slice.ToMap` instead keeps the first occurrence, and `FromSeq2` the last pair.
+- **`group.Count` counts per bucket**, returning a map keyed by group like `Sum`, `Min`, `Max` and `Avg`; the number of groups is `Count().Count()`. This diverges from LINQ, where `Count()` on a `GroupBy` counts the groups.
 - **`Except` and `Intersect` keep duplicates.** They include or exclude values rather than building a set; chain `Distinct` if you want one. This diverges from LINQ.
 - **`dictionary.ToSlice`, `Values`, `Keys` and `dictionary.ToSeq` return an unordered result**, being map iterations.
 
